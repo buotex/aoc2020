@@ -1,0 +1,13 @@
+name: aoc
+channels:
+    - conda-forge
+
+dependencies:
+    - pandas
+    - numpy
+    - matplotlib
+    - seaborn
+    - scipy
+    - pytest
+    - pytest-watch
+    - numexpr
