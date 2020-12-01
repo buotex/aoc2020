@@ -11,3 +11,6 @@ dependencies:
     - pytest
     - pytest-watch
     - numexpr
+    - pip
+    - pip:
+        - advent-of-code-data
