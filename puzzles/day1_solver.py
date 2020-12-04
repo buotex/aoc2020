@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-import aoc2020
+import aoc
 
 data = pd.read_csv("./day1_input.txt", names=["entry"], dtype=[("entry", "int")])
 print(data.info())

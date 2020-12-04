@@ -1,4 +1,4 @@
-from aoc2020 import graph
+from aoc import graph
 def test_dfs():
     adj = [[1,2], [2,3], [3], [3]]
     result = graph.search(adj, target=3, start=0, mode="dfs")

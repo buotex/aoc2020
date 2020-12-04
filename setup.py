@@ -5,8 +5,8 @@ except ImportError:
 
 
 setup(
-    name='aoc2020',
+    name='aoc',
     packages=[
-        'aoc2020',
+        'aoc',
     ],
 )

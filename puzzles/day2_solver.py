@@ -4,7 +4,7 @@ import io
 import re
 import sys
 from loguru import logger
-import aoc2020
+import aoc
 
 logger.remove()
 logger.add(sys.stderr, format="{level} {name}:{function}:{line} {message}")

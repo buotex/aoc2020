@@ -5,7 +5,7 @@ import re
 import sys
 from loguru import logger
 
-import aoc2020
+import aoc
 
 logger.remove()
 logger.add(sys.stderr, format="{level} {name}:{function}:{line} {message}")
@@ -15,8 +15,10 @@ testdata = """
 
 
 def func(input):
-    data = pd.read_csv(input, sep=" ", names=[])
+    pass
 
-
-func(io.StringIO(testdata))
-func("./dayx_input.txt")
+if __name__ == "__main__":
+    testdata = testdata.split("\n")
+    data = [line.rstrip() for line in open("dayx_input.txt")]
+    func(testdata)
+    func(data)

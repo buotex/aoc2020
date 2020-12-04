@@ -7,13 +7,11 @@ from loguru import logger
 np.set_printoptions(threshold=np.inf)
 
 
-import aoc2020
+import aoc
 
 logger.remove()
 logger.add(sys.stderr, format="{level} {name}:{function}:{line} {message}")
-
-testdata = """
-..##.......
+testdata = """..##.......
 #...#...#..
 .#....#..#.
 ..#.#...#.#
@@ -23,14 +21,12 @@ testdata = """
 .#........#
 #.##...#...
 #...##....#
-.#..#...#.#
-"""
+.#..#...#.#"""
 
 
-def func(input):
-    data = pd.read_csv(input, names=["data"], sep=';')
+def func(data):
     mapping = {".": 0, "#": 1}
-    data = aoc2020.matrix.text2int(data.data, mapping)
+    data = aoc.matrix.text2np(data, mapping)
     #logger.info(data) 
     values_31 = func2(data, 3, 1)
     values_11 = func2(data, 1, 1)
@@ -38,7 +34,7 @@ def func(input):
     values_71 = func2(data, 7, 1)
     values_12 = func2(data, 1, 2)
 
-    drawing = aoc2020.matrix.int2text(values_31, {0: ".", 1: "#", 2: "O", 3:"X"})
+    drawing = aoc.matrix.np2text(values_31, {0: ".", 1: "#", 2: "O", 3:"X"})
     logger.info(drawing)
     result = [np.sum(val == 3) for val in [values_11, values_31, values_51, values_71, values_12]]
     logger.info(result)
@@ -65,5 +61,11 @@ def draw(data, mapping):
     
 
 
-func(io.StringIO(testdata))
-#func("./day3_input.txt")
+if __name__ == "__main__":
+
+    testdata = testdata.split("\n")
+    data = [line.rstrip() for line in open("day3_input.txt")]
+    #print(testdata)
+    #print(data)
+    func(testdata)
+    func(data)
