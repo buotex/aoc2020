@@ -1,2 +1,1 @@
-from . import matrix
-from . import graph
+from . import *

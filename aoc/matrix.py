@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import operator
+from itertools import *
 
 def text2np(data, mapping=lambda x: x):
     data = list(map(lambda x: [mapping[i] for i in x], data))

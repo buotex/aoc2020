@@ -4,25 +4,28 @@ import io
 import re
 import sys
 from loguru import logger
+from pytest import fixture
 
 import aoc
 
 logger.remove()
 logger.add(sys.stderr, format="{level} {name}:{function}:{line} {message}")
 
-testdata = """ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
-byr:1937 iyr:2017 cid:147 hgt:183cm
+@fixture()
+def testdata():
+    return """ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
+    byr:1937 iyr:2017 cid:147 hgt:183cm
 
-iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884
-hcl:#cfa07d byr:1929
+    iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884
+    hcl:#cfa07d byr:1929
 
-hcl:#ae17e1 iyr:2013
-    eyr:2024
-    ecl:brn pid:760753108 byr:1931
-    hgt:179cm
+    hcl:#ae17e1 iyr:2013
+        eyr:2024
+        ecl:brn pid:760753108 byr:1931
+        hgt:179cm
 
-hcl:#cga07d eyr:2025 pid:166559648
-    iyr:2011 ecl:brn hgt:59in"""
+    hcl:#cga07d eyr:2025 pid:166559648
+        iyr:2011 ecl:brn hgt:59in"""
 
 testdata2 = """
 eyr:1972 cid:100
@@ -52,6 +55,11 @@ hcl:#888785
 
     iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719
 """
+
+def test_inputs(testdata):
+    testdata = testdata.split("\n")
+    assert func(testdata) == 2
+
 
 def is_valid(passport):
     if ("byr" in passport and
@@ -130,7 +138,7 @@ def is_valid_long(passport):
             
     return is_valid
 
-def func(input):
+def func(input, validator = is_valid_long):
     counter = 0
     passport = {}
     for line in input:
@@ -138,7 +146,7 @@ def func(input):
         if len(tokens) == 0:
             # empty line
             #print(passport)
-            if is_valid_long(passport):
+            if validator(passport):
                 counter += 1
                 if "cid" in passport:
                     del passport["cid"]
