@@ -3,7 +3,8 @@ import pandas as pd
 import io
 import re
 import sys
-from itertools import *
+import itertools
+import functools
 
 from loguru import logger
 from pytest import fixture
@@ -19,26 +20,34 @@ def testdata():
 """
 
 
-def algo(entry):
+def algo1(entry):
+    return 0
+
+def algo2(entry):
     return 0
 
 
-def test_entry():
-    entry = ""
-    #assert algo(entry) == 0
+#def test_subtask1():
+#    entry = ""
+#    assert algo1(entry) == 0
 
 
-def test_func(testdata):
-    assert func(testdata) == 0
+#def test_subtask2():
+#    entry = ""
+#    assert algo2(entry) == 0
 
 
-def func(input):
-    data = [line.rstrip() for line in input.split("\n")]
-    result = [algo(line) for line in data]
-    return 0
+def test_task(testdata):
+    assert task(testdata) == 0
+
+
+def task(input, subfunc = lambda x: x):
+    data = aoc.io.text2subsets(input)
+    data = list(map(subfunc, data))
+    return data
 
 
 if __name__ == "__main__":
-    #data = [line.rstrip() for line in open("dayx_input.txt").read()]
     data = open("dayx_input.txt").read().strip()
-    print(func(data))
+    logger.info(task(data))
+    logger.info(task(data))

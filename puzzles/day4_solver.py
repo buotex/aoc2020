@@ -3,6 +3,7 @@ import pandas as pd
 import io
 import re
 import sys
+from itertools import *
 from loguru import logger
 from pytest import fixture
 
@@ -27,7 +28,9 @@ def testdata():
     hcl:#cga07d eyr:2025 pid:166559648
         iyr:2011 ecl:brn hgt:59in"""
 
-testdata2 = """
+@fixture()
+def testdata2():
+    return """
 eyr:1972 cid:100
 hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926
 
@@ -57,8 +60,7 @@ hcl:#888785
 """
 
 def test_inputs(testdata):
-    testdata = testdata.split("\n")
-    assert func(testdata) == 2
+    assert task(testdata, is_valid) == 2
 
 
 def is_valid(passport):
@@ -138,30 +140,22 @@ def is_valid_long(passport):
             
     return is_valid
 
-def func(input, validator = is_valid_long):
-    counter = 0
-    passport = {}
-    for line in input:
-        tokens = line.split()
-        if len(tokens) == 0:
-            # empty line
-            #print(passport)
-            if validator(passport):
-                counter += 1
-                if "cid" in passport:
-                    del passport["cid"]
-                print([passport[key] for key in sorted(passport)])
-            passport = {}
-            continue
-        for x in tokens:
-            key, value = x.split(":")
-            passport[key] = value
-    return counter
+def task(input, validator = is_valid_long):
+    data = aoc.io.text2subsets(input, lambda x: x.split(), join_lines=True)
+
+    def create_dict(line):
+        my_dict = {}
+        for token in line:
+            key, val = token.split(":")
+            my_dict[key] = val
+        return my_dict
+
+    data = map(create_dict, data)
+    data = map(validator, data)
+
+    return sum(data)
 
 if __name__ == "__main__":
-    testdata = testdata.split("\n")
-    testdata2 = testdata2.split("\n")
-    data = [line.rstrip() for line in open("day4_input.txt")]
-    #print(data)
-    #print(func(testdata2))
-    print(func(data))
+    data = open("day4_input.txt").read().strip()
+    logger.info(task(data, is_valid))
+    logger.info(task(data))

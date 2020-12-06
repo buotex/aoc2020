@@ -26,7 +26,7 @@ testdata = """..##.......
 
 def func(data):
     mapping = {".": 0, "#": 1}
-    data = aoc.matrix.text2np(data, mapping)
+    data = aoc.io.text2grid(data, mapping)
     #logger.info(data) 
     values_31 = func2(data, 3, 1)
     values_11 = func2(data, 1, 1)
@@ -34,7 +34,7 @@ def func(data):
     values_71 = func2(data, 7, 1)
     values_12 = func2(data, 1, 2)
 
-    drawing = aoc.matrix.np2text(values_31, {0: ".", 1: "#", 2: "O", 3:"X"})
+    drawing = aoc.io.grid2text(values_31, {0: ".", 1: "#", 2: "O", 3:"X"})
     logger.info(drawing)
     result = [np.sum(val == 3) for val in [values_11, values_31, values_51, values_71, values_12]]
     logger.info(result)

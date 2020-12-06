@@ -17,36 +17,40 @@ testdata = """
 2-9 c: ccccccccc
 """
 
+def test_password(row):
+    policy, letter, password = row.split()
+    letter = letter[0]
+    limit_lower = int(policy.split("-")[0])
+    limit_upper = int(policy.split("-")[1])
+    count = len(re.findall(letter, password))
+    return count >= limit_lower and count <= limit_upper
+
+
+def test_password2(row):
+    policy, letter, password = row.split()
+    letter = letter[0]
+    limit_lower = int(policy.split("-")[0])
+    limit_upper = int(policy.split("-")[1])
+    return (
+        (password[limit_lower - 1] == letter and password[limit_upper - 1] != letter ) 
+     or 
+        (password[limit_lower - 1] != letter and password[limit_upper - 1] == letter ) 
+    )
+
+
 def func(input):
-    data = pd.read_csv(input, sep=" ", names=["policy", "letter", "password"])
-    data.letter = data.letter.str[0]
-    logger.info(data.head())
-    def test_password(row):
-        policy = row.policy
-        letter = row.letter
-        password = row.password
-        limit_lower = int(policy.split("-")[0])
-        limit_upper = int(policy.split("-")[1])
-        count = len(re.findall(letter, password))
-        return count >= limit_lower and count <= limit_upper
+    data = aoc.io.text2subsets(input, test_password)
 
-    result = data.apply(test_password, axis=1)
-    logger.info(result[(result == True)].count())
+    return sum(data)
 
-    def test_password2(row):
-        policy = row.policy
-        letter = row.letter
-        password = row.password
-        limit_lower = int(policy.split("-")[0])
-        limit_upper = int(policy.split("-")[1])
-        return (
-            (password[limit_lower - 1] == letter and password[limit_upper - 1] != letter ) 
-         or 
-            (password[limit_lower - 1] != letter and password[limit_upper - 1] == letter ) 
-        )
+def func2(input):
+    data = aoc.io.text2subsets(input, test_password2)
 
-    result = data.apply(test_password2, axis=1)
-    logger.info(result[(result == True)].count())
+    return sum(data)
 
-func(io.StringIO(testdata))
-func("./day2_input.txt")
+
+if __name__ == "__main__":
+    #data = [line.rstrip() for line in open("dayx_input.txt").read()]
+    data = open("day2_input.txt").read().strip()
+    print(func(data))
+    print(func2(data))
