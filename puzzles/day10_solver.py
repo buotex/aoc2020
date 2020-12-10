@@ -80,7 +80,7 @@ def algo2(data, _start_index, _current_diff):
             return 1
         else: 
             if current_diff + data[start_index + 1] <= 3:
-                return cached_algo(start_index + 1, current_diff + data[start_index]) + cached_algo(start_index + 1, current_diff)
+                return cached_algo(start_index + 1, current_diff + data[start_index]) + cached_algo(start_index + 1, data[start_index])
             else:
                 return cached_algo(start_index + 1, data[start_index+1])
     return cached_algo(_start_index, _current_diff)
