@@ -97,7 +97,7 @@ def task2(input):
         state, graceful_terminate = pc(data_copy, state)
         if graceful_terminate == True:
             return state, graceful_terminate
-    return state, graceful_terminate
+    raise RuntimeError("PC doesn't terminate at all")
 
 
 
