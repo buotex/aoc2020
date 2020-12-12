@@ -10,6 +10,8 @@ from loguru import logger
 from pytest import fixture
 
 import aoc
+from aoc.pc import (pc, State)
+from aoc.utils import (KeyLimits, get_limits, get_neighbors, get_directions)
 
 logger.remove()
 logger.add(sys.stderr, format="{level} {name}:{function}:{line} {message}")
@@ -41,13 +43,15 @@ def test_task(testdata):
     assert task(testdata) == 0
 
 
-def task(input, subfunc = lambda x: x):
+def task(input):
     data = aoc.io.text2subsets(input)
-    data = list(map(subfunc, data))
+    #data = list(map(subfunc, data))
     return data
 
 
 if __name__ == "__main__":
     data = open("dayx_input.txt").read().strip()
-    logger.info(task(data))
-    logger.info(task(data))
+    result1 = task(data)
+    logger.info(result1)
+    #result2 = task2(data)
+    #logger.info(result2)

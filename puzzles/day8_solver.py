@@ -12,6 +12,7 @@ from loguru import logger
 from pytest import fixture
 
 import aoc
+from aoc.pc import *
 
 logger.remove()
 logger.add(sys.stderr, format="{level} {name}:{function}:{line} {message}")
@@ -29,24 +30,6 @@ jmp -4
 acc +6
 """
 
-@dataclass
-class State:
-    pointer = 0
-    acc = 0
-
-def algo1(data, state):
-    tokens = data[state.pointer]
-    instruction, argument = tokens.split()
-    argument = int(argument)
-    if instruction == "jmp":
-        state.pointer += argument
-    else:
-        state.pointer += 1
-    if instruction == "acc":
-        state.acc += argument
-
-    return state
-
 
 def test_task(testdata):
     state, _ = task(testdata)
@@ -55,22 +38,6 @@ def test_task(testdata):
 def test_task2(testdata):
     state, _ = task2(testdata)
     assert state.acc == 8
-
-def pc(data, state):
-    used_pointers = set()
-    state = State()
-    graceful_terminate = True
-    while True:
-        if state.pointer >= len(data):
-            graceful_terminate = True
-            break
-        if state.pointer in used_pointers:
-            graceful_terminate = False
-            break
-        used_pointers.add(state.pointer)
-        state = algo1(data, state)
-    #data = list(map(subfunc, data))
-    return state, graceful_terminate
 
 
 def task(input):
