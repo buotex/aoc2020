@@ -93,8 +93,6 @@ def task2(input, target_sum=0):
             return min(data[i:i+found_index+2]) + max(data[i:i+found_index+2])
         except:
             continue
-            
-            
 
 
     return -1
@@ -105,4 +103,3 @@ if __name__ == "__main__":
     result1 = task(data)
     result2 = task2(data, target_sum=result1)
     print(result2)
-

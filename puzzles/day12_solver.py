@@ -5,6 +5,7 @@ from loguru import logger
 from pytest import fixture
 
 import aoc
+import os
 
 logger.remove()
 logger.add(sys.stderr, format="{level} {name}:{function}:{line} {message}")
@@ -67,6 +68,7 @@ def test_task2(testdata):
 
 def task(input, waypoint = (1,0), mode="ship"):
     data = aoc.io.text2subsets(input)
+
     def subfunc(line):
         tokens = re.fullmatch(r"([A-Z])([0-9]*)", line)
         return [tokens.group(1), int(tokens.group(2))]

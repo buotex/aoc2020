@@ -1,17 +1,19 @@
-import numpy as np
-import pandas as pd
-import io
-import re
-import sys
-import itertools
-import functools
+import numpy as np  # noqa
+import pandas as pd  # noqa
+import io  # noqa
+import re  # noqa
+import sys  # noqa
+import itertools  # noqa
+import functools  # noqa
+
 
 from loguru import logger
 from pytest import fixture
 
 import aoc
-from aoc.pc import *
-from aoc.utils import *
+from aoc.pc import *  # noqa
+
+from aoc.utils import get_limits
 
 logger.remove()
 logger.add(sys.stderr, format="{level} {name}:{function}:{line} {message}")
