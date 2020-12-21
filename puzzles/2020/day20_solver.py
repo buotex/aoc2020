@@ -1,18 +1,12 @@
 import numpy as np
-import pandas as pd
-import io
-import re
 import sys
 import itertools
-import functools
 import collections
 
 from loguru import logger
 from pytest import fixture
 
 import aoc
-from aoc.pc import pc, State
-from aoc.utils import KeyLimits, get_limits, get_neighbors, get_directions
 
 logger.remove()
 logger.add(sys.stderr, format="{level} {name}:{function}:{line} {message}")
@@ -188,6 +182,7 @@ def test_task2(testdata):
 
 
 def part1_algo(tiles):
+
     # test tiles that won't line up
     rel_positions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
     neighborhood = collections.defaultdict(lambda: collections.defaultdict(list))
@@ -233,7 +228,6 @@ def task2(input):
         tiles[tile_nr] = tile_data
     neighborhood = part1_algo(tiles)
 
-    possible_positions = {}
     left_corner_tile = [
         key
         for key, item in neighborhood.items()
