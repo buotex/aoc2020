@@ -5,20 +5,25 @@ import re
 import sys
 from loguru import logger
 import aoc
+from pytest import fixture
 
 logger.remove()
 logger.add(sys.stderr, format="{level} {name}:{function}:{line} {message}")
 
 
-
-testdata = """
+@fixture()
+def testdata():
+    return """
 1-3 a: abcde
 1-3 b: cdefg
 2-9 c: ccccccccc
 """
 
-def test_password(row):
-    policy, letter, password = row.split()
+
+def test_password(testdata):
+    data = aoc.io.text2subsets(testdata)
+
+    policy, letter, password = data[0].split()
     letter = letter[0]
     limit_lower = int(policy.split("-")[0])
     limit_upper = int(policy.split("-")[1])
@@ -26,22 +31,22 @@ def test_password(row):
     return count >= limit_lower and count <= limit_upper
 
 
-def test_password2(row):
-    policy, letter, password = row.split()
+def test_password2(testdata):
+    data = aoc.io.text2subsets(testdata)
+    policy, letter, password = data[0].split()
     letter = letter[0]
     limit_lower = int(policy.split("-")[0])
     limit_upper = int(policy.split("-")[1])
     return (
-        (password[limit_lower - 1] == letter and password[limit_upper - 1] != letter ) 
-     or 
-        (password[limit_lower - 1] != letter and password[limit_upper - 1] == letter ) 
-    )
+        password[limit_lower - 1] == letter and password[limit_upper - 1] != letter
+    ) or (password[limit_lower - 1] != letter and password[limit_upper - 1] == letter)
 
 
 def func(input):
     data = aoc.io.text2subsets(input, test_password)
 
     return sum(data)
+
 
 def func2(input):
     data = aoc.io.text2subsets(input, test_password2)
@@ -50,7 +55,7 @@ def func2(input):
 
 
 if __name__ == "__main__":
-    #data = [line.rstrip() for line in open("dayx_input.txt").read()]
+    # data = [line.rstrip() for line in open("dayx_input.txt").read()]
     data = open("day2_input.txt").read().strip()
     print(func(data))
     print(func2(data))

@@ -34,12 +34,12 @@ def test_expression2():
     assert algo1(testdata) == 51
 
 
-def test_expression2():
+def test_expression3():
     testdata = "2 * 3 + (4 * 5)"
     assert algo2(testdata) == 46
 
 
-def test_expression3():
+def test_expression4():
     testdata = "((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2"
     assert algo2(testdata) == 23340
 
@@ -159,7 +159,7 @@ def algo2(line):
 
 
 def test_task(testdata):
-    assert task(testdata) == 10
+    assert task(testdata) == 51
 
 
 def task(input):
