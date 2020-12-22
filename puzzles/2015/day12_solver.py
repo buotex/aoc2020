@@ -18,6 +18,7 @@ logger.add(sys.stderr, format="{level} {name}:{function}:{line} {message}")
 @fixture()
 def testdata():
     return """
+[-1,{"a":1}]
     """
 
 
@@ -40,7 +41,8 @@ def algo2(entry):
 
 
 def test_task(testdata):
-    assert task(testdata) == 0
+    # assert task(testdata) == 0
+    assert task("""{"a":{"b":4},"c":-1}""") == 3
 
 
 def test_task2(testdata):
@@ -49,9 +51,13 @@ def test_task2(testdata):
 
 
 def task(input):
-    data = aoc.io.text2subsets(input)
+    val = 0
+    print(input)
+    vals = list(map(int, re.findall(r"-?\d+\.?\d*", input)))
+    return sum(list(vals))
+    # data = aoc.io.text2subsets(input)
+
     # data = list(map(subfunc, data))
-    return data
 
 
 def task2(input):
@@ -61,7 +67,7 @@ def task2(input):
 
 
 def main():
-    data = open("puzzles/2015/day1_input.txt").read().strip()
+    data = open("puzzles/2015/day12_input.txt").read().strip()
     result1 = task(data)
     result2 = task2(data)
     if result2:

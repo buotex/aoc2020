@@ -49,19 +49,34 @@ def test_task2(testdata):
 
 
 def task(input):
-    data = aoc.io.text2subsets(input)
+    data = list(map(int, input))
+    print(data)
+    for i in range(50):
+        new_data = []
+        old_val = data[0]
+        counter = 1
+        for val in chain(data[1:], [float("Inf")]):
+            if val != old_val:
+                new_data.append(counter)
+                new_data.append(old_val)
+                old_val = val
+                counter = 1
+            else:
+                counter += 1
+        data = new_data
+
     # data = list(map(subfunc, data))
-    return data
+    return len(data)
 
 
 def task2(input):
-    data = aoc.io.text2subsets(input)
     # data = list(map(subfunc, data))
     return None
 
 
 def main():
-    data = open("puzzles/2015/day1_input.txt").read().strip()
+    data = open("puzzles/2015/day10_input.txt").read().strip()
+    data = "1321131112"
     result1 = task(data)
     result2 = task2(data)
     if result2:
