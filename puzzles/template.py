@@ -1,10 +1,11 @@
-import numpy as np
+from collections import defaultdict, Counter
+from functools import cache
 import io
+from itertools import chain, groupby, permutations
 import re
 import sys
-from itertools import chain, groupby, permutations
-from functools import cache
 
+import numpy as np
 from loguru import logger
 from pytest import fixture
 
@@ -17,7 +18,7 @@ logger.add(sys.stderr, format="{level} {name}:{function}:{line} {message}")
 @fixture()
 def testdata():
     return """
-"""
+    """
 
 
 def algo1(entry):
@@ -38,25 +39,35 @@ def algo2(entry):
 #    assert algo2(entry) == 0
 
 
-def test_task(testdata):
-    assert task(testdata) == 0
-
-
 def task(input):
     data = aoc.io.text2subsets(input)
     # data = list(map(subfunc, data))
     return data
 
 
+def test_task(testdata):
+    assert task(testdata) == 0
+
+
 def task2(input):
     data = aoc.io.text2subsets(input)
     # data = list(map(subfunc, data))
-    return data
+    return None
 
 
-if __name__ == "__main__":
-    data = open("dayx_input.txt").read().strip()
+def test_task2(testdata):
+    pass
+    # assert task2(testdata) == 0
+
+
+def main():
+    data = open("puzzles/year/dayx_input.txt").read().strip()
     result1 = task(data)
-    logger.info(result1)
-    # result2 = task2(data)
-    # logger.info(result2)
+    result2 = task2(data)
+    if result2:
+        logger.info(result2)
+    else:
+        logger.info(result1)
+
+
+"main" in __name__ and main()
