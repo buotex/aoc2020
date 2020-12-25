@@ -1,7 +1,7 @@
 from collections import defaultdict, Counter
 from functools import cache
 import io
-from itertools import chain, groupby, permutations
+from itertools import chain, groupby, permutations, combinations
 import re
 import sys
 
@@ -39,13 +39,50 @@ def algo2(entry):
 #    assert algo2(entry) == 0
 
 
-def task(input):
+def fit(containers, remaining, indices):
+    if sum(containers) < remaining:
+        return False
+    if remaining == 0:
+        return True
+    for i, c in enumerate(containers):
+        if not indices or i > indices[-1]:
+            if c <= remaining:
+                new_indices = indices.copy()
+                new_indices.append(i)
+                if fit(containers, remaining - c, new_indices):
+                    return True
+    return False
+
+
+def task(input, num_groups=3):
     data = aoc.io.text2subsets(input)
     numbers = list(map(int, data))
-    target_sum = sum(numbers) // 3
+    target_sum = sum(numbers) // num_groups
     logger.info(target_sum)
+    results = []
+    for i in range(1, len(numbers)):
+        logger.info(i)
+        comb = combinations(numbers, i)
+        for c in comb:
+            if sum(c) != target_sum:
+                continue
+            else:
+                remaining_numbers = set(numbers).difference(set(c))
+
+                fits = fit(
+                    sorted(list(remaining_numbers), reverse=True), target_sum, list()
+                )
+                # check if other 2 groups exist
+                if not fits:
+                    continue
+                quantum = np.prod(c)
+                print(c)
+                results.append(quantum)
+        if results:
+            break
+
     # data = list(map(subfunc, data))
-    return data
+    return min(results)
 
 
 def test_task(testdata):
@@ -53,9 +90,7 @@ def test_task(testdata):
 
 
 def task2(input):
-    data = aoc.io.text2subsets(input)
-    # data = list(map(subfunc, data))
-    return None
+    return task(input, 4)
 
 
 def test_task2(testdata):
