@@ -23,9 +23,9 @@ def dict2text(data):
     max_i = max(data.keys(), key=lambda x: x[0])[0]
     max_j = max(data.keys(), key=lambda x: x[1])[1]
     result = []
-    for i in range(max_i):
+    for i in range(max_i + 1):
         line = []
-        for j in range(max_j):
+        for j in range(max_j + 1):
             line.append(data[(i, j)])
         result.append("".join(line))
     return "\n".join(result)

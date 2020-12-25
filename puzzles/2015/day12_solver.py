@@ -60,19 +60,37 @@ def task(input):
     # data = list(map(subfunc, data))
 
 
+def count_values(data):
+
+    if isinstance(data, list):
+        return sum([count_values(d) for d in data])
+    elif isinstance(data, dict):
+        if "red" in data.values():
+            return 0
+        else:
+            return sum([count_values(d) for d in data.values()])
+    else:
+        if isinstance(data, int):
+            return data
+        return 0
+
+
 def task2(input):
-    data = aoc.io.text2subsets(input)
+    import json
+
+    data = json.loads(input)
+
     # data = list(map(subfunc, data))
-    return None
+    return count_values(data)
 
 
 def main():
     data = open("puzzles/2015/day12_input.txt").read().strip()
-    result1 = task(data)
     result2 = task2(data)
     if result2:
         logger.info(result2)
     else:
+        result1 = task(data)
         logger.info(result1)
 
 
