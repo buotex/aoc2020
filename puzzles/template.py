@@ -62,11 +62,11 @@ def test_task2(testdata):
 
 def main():
     data = open("puzzles/year/dayx_input.txt").read().strip()
-    result1 = task(data)
     result2 = task2(data)
     if result2:
         logger.info(result2)
     else:
+        result1 = task(data)
         logger.info(result1)
 
 
