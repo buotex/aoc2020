@@ -38,4 +38,4 @@ testinput = """
 """
 # @test task(testinput) == 0
 io = read(open("puzzles/2016/day3_input.txt", "r"), String)
-task2(io)
+println(task2(io))
