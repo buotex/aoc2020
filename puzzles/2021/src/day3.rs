@@ -4,7 +4,7 @@ struct MyStruct {
     input: &'static str,
 }
 const INPUT: MyStruct = MyStruct {
-test_input: "00100
+    test_input: "00100
 11110
 10110
 10111
@@ -16,7 +16,7 @@ test_input: "00100
 11001
 00010
 01010",
-input: "111111010011
+    input: "111111010011
 110011001100
 010011111000
 101001100011
@@ -1015,38 +1015,83 @@ input: "111111010011
 001010000010
 100010000100
 110001000110
-101100100111"
+101100100111",
 };
 
+pub fn filter_good_bit(input: Vec<Vec<i32>>, index: usize, find_most: bool) -> Vec<Vec<i32>> {
+    let count_1: i32 = std::iter::Sum::sum(
+        input
+            .iter()
+            .map(|x| -> i32 { x[index] })
+            .collect::<Vec<i32>>()
+            .iter(),
+    );
 
-pub fn day3(){
-    let input: Vec::<Vec::<i32>> = INPUT.input.lines().map(
-        |x| x.chars().map(
-            |y| y.to_digit(10).unwrap() as i32
-        ).collect()).collect();
+    let count_0 = input.len() as i32 - count_1;
+
+    let good_bit: i32 = if find_most {
+        (count_1 >= count_0) as i32
+    } else {
+        (count_0 > count_1) as i32
+    };
+
+    input.into_iter().filter(|x| x[index] == good_bit).collect()
+}
+pub fn bin2dec(inp: Vec<i32>) -> i32 {
+    let mut dec: i32 = 0;
+    for (i, val) in inp.iter().enumerate() {
+        dec += val * i32::pow(2, inp.len() as u32 - 1 - i as u32);
+    }
+    return dec;
+}
+
+pub fn day3() {
+    let input: Vec<Vec<i32>> = INPUT
+        .input
+        .lines()
+        .map(|x| x.chars().map(|y| y.to_digit(10).unwrap() as i32).collect())
+        .collect();
     println!("{}", input.len());
-    let mut count: Vec::<i32> = Vec::new();
-    let mut gamma =  Vec::<i32>::new();
-    let mut epsilon =  Vec::<i32>::new();
+    let mut count: Vec<i32> = Vec::new();
+    let mut gamma = Vec::<i32>::new();
+    let mut epsilon = Vec::<i32>::new();
     for i in 0..12 {
-        count.push(std::iter::Sum::sum(input.iter().map(|x|-> i32{ x[i] }).collect::<Vec<i32>>().iter()));
+        count.push(std::iter::Sum::sum(
+            input
+                .iter()
+                .map(|x| -> i32 { x[i] })
+                .collect::<Vec<i32>>()
+                .iter(),
+        ));
         if count[i] > input.len() as i32 / 2 {
             gamma.push(1);
             epsilon.push(0);
-        }
-        else {
+        } else {
             gamma.push(0);
             epsilon.push(1);
         }
     }
-    let mut gamma_num = 0;
-    let mut epsilon_num = 0;
-    for i in (0..12).rev() {
-        gamma_num += gamma[i] * i32::pow(2, 11 - i as u32);
-        epsilon_num += epsilon[i] * i32::pow(2, 11 - i as u32);
+    let gamma_num = bin2dec(gamma);
+    let epsilon_num = bin2dec(epsilon);
+    println!("{} {} {}", gamma_num, epsilon_num, gamma_num * epsilon_num);
+
+    let mut oxygen_vec = input.clone();
+    let mut oxygen = 0;
+    for i in 0..12 {
+        oxygen_vec = filter_good_bit(oxygen_vec, i, true);
+        if oxygen_vec.len() == 1 {
+            oxygen = bin2dec(oxygen_vec[0].clone());
+        }
     }
-    println!("{} {} {}", gamma_num, epsilon_num, gamma_num * epsilon_num)
 
+    let mut co2_vec = input.clone();
+    let mut co2 = 0;
+    for i in 0..12 {
+        co2_vec = filter_good_bit(co2_vec, i, false);
+        if co2_vec.len() == 1 {
+            co2 = bin2dec(co2_vec[0].clone());
+        }
+    }
 
-
+    println!("{}, {}, {}", oxygen, co2, oxygen * co2);
 }

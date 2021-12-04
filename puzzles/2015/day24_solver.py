@@ -99,6 +99,7 @@ def test_task2(testdata):
 
 
 def main():
+    1 / 0
     data = open("puzzles/2015/day24_input.txt").read().strip()
     result2 = task2(data)
     if result2:
