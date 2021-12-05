@@ -1,8 +1,8 @@
 extern crate itertools;
 extern crate ndarray;
 extern crate regex;
-mod day4;
+mod day5;
 fn main() {
     //day1::day1();
-    day4::day4();
+    day5::day5();
 }

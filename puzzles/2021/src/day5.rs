@@ -544,24 +544,33 @@ fn set_pipe(board: &mut Array2<usize>, pipe: (usize, usize, usize, usize)) {
     }
     //handling diagonals
     else {
-        let mut range_x = pipe.0..=pipe.2;
-        if pipe.0 > pipe.2 {
-            range_x = pipe.2..=pipe.0;
-        }
-        let mut range_y = pipe.1..=pipe.3;
-        if pipe.1 > pipe.3 {
-            range_y = (pipe.1..=pipe.3).rev();
-        }
-        for (i, j) in zip(range_x, range_y) {
-            println!("{}, {}", i, j);
-            board[[i, j]] += 1;
+        if pipe.0 > pipe.2 && pipe.1 > pipe.3 {
+            for (i, j) in zip(pipe.2..=pipe.0, pipe.3..=pipe.1) {
+                println!("{}, {}", i, j);
+                board[[i, j]] += 1;
+            }
+        } else if pipe.0 < pipe.2 && pipe.1 > pipe.3 {
+            for (i, j) in zip(pipe.0..=pipe.2, (pipe.3..=pipe.1).rev()) {
+                println!("{}, {}", i, j);
+                board[[i, j]] += 1;
+            }
+        } else if pipe.0 < pipe.2 && pipe.1 < pipe.3 {
+            for (i, j) in zip(pipe.0..=pipe.2, pipe.1..=pipe.3) {
+                println!("{}, {}", i, j);
+                board[[i, j]] += 1;
+            }
+        } else {
+            for (i, j) in zip(pipe.2..=pipe.0, (pipe.1..=pipe.3).rev()) {
+                println!("{}, {}", i, j);
+                board[[i, j]] += 1;
+            }
         }
     }
 }
 pub fn day5() {
-    let pipes = parse_input(TEST_INPUT);
+    let pipes = parse_input(INPUT);
     println!("{}", pipes.len());
-    let boardsize = 10;
+    let boardsize = 1000;
     let mut board = Array2::<usize>::zeros((boardsize, boardsize));
     for pipe in pipes {
         set_pipe(&mut board, pipe);
