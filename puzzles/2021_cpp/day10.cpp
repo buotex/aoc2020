@@ -98,16 +98,15 @@ const char *puzzle_input =
 {[({([(<{[[[<<<>[]>(()<>)>]<(([]{})[[][]])(<[]()><{}<>>)>](({{<><>}<()<>>}{[{}{}]([]<>)})[<{<>}[[]{}]
 )";
 
-const char * test_input = R"(
+const char *test_input = R"(
 [({(<(())[]>[[{[]{<()<>>
 [(()[<>])]({[<{<<[]>>(
 (((({<>}<{<{<>}{[]{[]{}
 {<[[]]>}<{[{[{[]{()[[[]
 <{([{{}}[<[[[<>{}]]]>[]]
 )";
-    
-    
-    std::vector<std::string> parse(const char *inp) {
+
+std::vector<std::string> parse(const char *inp) {
   std::string::size_type pos = 0;
   std::string::size_type prev = 0;
 
@@ -206,17 +205,19 @@ std::vector<int> calc_error_scores(const std::vector<std::string> &lines) {
   }
   return scores;
 }
-std::vector<int64_t> calc_completion_scores(const std::vector<std::string> &lines) {
+std::vector<int64_t>
+calc_completion_scores(const std::vector<std::string> &lines) {
 
   std::vector<int64_t> scores;
   for (auto line : lines) {
     auto score = calc_completion_score(line);
     scores.push_back(score);
   }
-  auto nonzero = [] (int i) {return i != 0;};
+  auto nonzero = [](int i) { return i != 0; };
 
   std::vector<int64_t> scores_filtered;
-  std::copy_if(scores.cbegin(), scores.cend(), std::back_inserter(scores_filtered), nonzero);
+  std::copy_if(scores.cbegin(), scores.cend(),
+               std::back_inserter(scores_filtered), nonzero);
 
   return scores_filtered;
 }
@@ -224,8 +225,9 @@ std::vector<int64_t> calc_completion_scores(const std::vector<std::string> &line
 int main() {
   auto lines = parse(puzzle_input);
   auto error_scores = calc_error_scores(lines);
-  std::cout << std::accumulate(error_scores.begin(), error_scores.end(), 0) << std::endl;
+  std::cout << std::accumulate(error_scores.begin(), error_scores.end(), 0)
+            << std::endl;
   auto completion_scores = calc_completion_scores(lines);
   std::sort(completion_scores.begin(), completion_scores.end());
-   std::cout << completion_scores[completion_scores.size() / 2] << std::endl;
+  std::cout << completion_scores[completion_scores.size() / 2] << std::endl;
 }
