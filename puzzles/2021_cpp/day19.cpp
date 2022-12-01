@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include <regex>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -1086,7 +1087,22 @@ struct Transformation {
   std::array<std::pair<size_t, size_t>, 3> mapping;
   std::array<int, 3> offsets;
   std::array<bool, 3> flips;
+  friend std::ostream &operator<<(std::ostream &os,
+                                  const Transformation &transf);
 };
+
+std::ostream &operator<<(std::ostream &os, const Transformation &t) {
+  os << "Transforming from sensors: " << t.sensor_1 << " " << t.sensor_2
+     << '\n';
+  for (const auto &m : t.mapping) {
+    os << "Mapping: " << m.first << " " << m.second << '\n';
+  }
+  for (size_t i = 0; i < 3; ++i) {
+    os << "offset: " << t.offsets[i] << '\n';
+    os << "flips: " << t.flips[i] << '\n';
+  }
+  return os;
+}
 
 template <int N>
 std::array<std::vector<std::array<int, 3>>, N> parse(const char *input) {
@@ -1145,9 +1161,13 @@ match(const std::array<std::vector<int>, 3> &set1,
       for (int flip = 0; flip < 2; ++flip) {
         if (match_found)
           break;
-        auto flipper = [flip](auto &elem) { elem = (flip) ? elem : -elem; };
+        auto flipper = [flip](auto &elem) { elem = (flip) ? -elem : elem; };
         auto flipped = vec2;
         std::for_each(begin(flipped), end(flipped), flipper);
+        // std::cout << "flipped" << '\n';
+        // for (auto elem : flipped) {
+        //   std::cout << elem << '\n';
+        //   }
         std::map<int, size_t> differences;
         for (auto elem1 : vec1) {
           for (auto elem2 : flipped) {
@@ -1160,9 +1180,18 @@ match(const std::array<std::vector<int>, 3> &set1,
                                return keyval1.second < keyval2.second;
                              });
         auto [val, count] = *iter;
-        // std::cout << "val: " << val << " count: " << count<< '\n';
         if (count >= num_matches) {
+          // std::cout << "vec1" << '\n';
+          // for (auto elem : vec1) {
+          //   std::cout << elem << '\n';
+          //   }
+          // std::cout << "flipped" << '\n';
+          // for (auto elem : flipped) {
+          //   std::cout << elem << '\n';
+          //   }
           matches.push_back({dim1, dim2, val, flip});
+          std::cout << dim1 << "->" << dim2 << " Offset: " << val
+                    << " Flip: " << flip << '\n';
           match_found = true;
         }
       }
@@ -1195,20 +1224,23 @@ find_offsets(const std::array<std::vector<int>, 3> &set1,
 }
 
 std::array<std::vector<int>, 3>
-apply(const std::array<std::vector<int>, 3> &data,
-      const Transformation &transf) {
-  auto transformed = data;
-  for (auto m : transf.mapping) {
+reverse_transformation(std::array<std::vector<int>, 3> data,
+                       const Transformation &transf) {
+  auto transformed = decltype(data)();
+  for (int i = 0; i < 3; ++i) {
+    auto m = transf.mapping[i];
     // transformed[];
     // data[m.second] += offset;
-    auto offset = transf.offsets[m.second];
-    auto &column = transformed[m.second];
-    auto flip = transf.flips[m.second];
+    auto column = data[m.second];
+    auto offset = transf.offsets[i];
+    auto flip = transf.flips[i];
     std::for_each(begin(column), end(column), [flip, offset](auto &val) {
       if (flip)
         val = -val;
       val += offset;
     });
+    transformed[m.first] = column;
+    std::cout << "Moving columns: " << m.first << " " << m.second << "\n";
   }
 
   return transformed;
@@ -1218,30 +1250,47 @@ Transformation flip_transformation(Transformation transf) {
   std::swap(transf.sensor_1, transf.sensor_2);
   for (size_t i = 0; i < 3; ++i) {
     transf.mapping[i] = {transf.mapping[i].second, transf.mapping[i].first};
-    transf.offsets[i] = -transf.offsets[i];
-    transf.flips[i] = !transf.flips[i];
+    if (transf.flips[transf.mapping[i].second]) {
+      transf.offsets[transf.mapping[i].second] = +transf.offsets[i];
+
+    } else
+      transf.offsets[transf.mapping[i].second] = -transf.offsets[i];
+    transf.flips[transf.mapping[i].second] = transf.flips[i];
   }
   return transf;
 }
 
 Transformation combine_transformations(const Transformation &first,
                                        const Transformation &second) {
+  std::cout << "combine transformations" << first << second << "\n";
   auto combined = Transformation();
   combined.sensor_1 = first.sensor_1;
   combined.sensor_2 = second.sensor_2;
 
   for (int i = 0; i < 3; ++i) {
     auto m1 = first.mapping[i];
-    for (auto m2 : second.mapping) {
-      if (m1.second == m2.first) {
-        combined.mapping[i] = {m1.first, m2.second};
-      }
+    for (int j = 0; j < 3; ++j) {
+      auto m2 = second.mapping[j];
+      if (m1.second != m2.first)
+        continue;
+
+      combined.mapping[i] = {m1.first, m2.second};
+      combined.offsets[i] = 0;
+      if (first.flips[i])
+        combined.offsets[i] -= second.offsets[j];
+      else
+        combined.offsets[i] += second.offsets[j];
+      combined.offsets[i] += first.offsets[i];
+
+      combined.flips[i] = (first.flips[i] != second.flips[j]);
     }
   }
 
+  std::cout << "combined" << combined << "\n";
+
   return combined;
 }
-std::vector<Transformation>
+std::map<std::pair<size_t, size_t>, Transformation>
 normalize_transformations(const std::vector<Transformation> &transformations) {
   std::map<std::pair<size_t, size_t>, Transformation> transformation_map;
   for (auto transf : transformations) {
@@ -1254,7 +1303,7 @@ normalize_transformations(const std::vector<Transformation> &transformations) {
     all_mapped = true;
     for (auto &keyval : transformation_map) {
       auto [mapping, transf] = keyval;
-      std::cout << mapping.first << " " << mapping.second << std::endl;
+      std::cout << mapping.first << " " << mapping.second << '\n';
       if (mapping.first != 0) {
         all_mapped = false;
         if (transformation_map.contains({0, mapping.first})) {
@@ -1266,24 +1315,21 @@ normalize_transformations(const std::vector<Transformation> &transformations) {
         } else if (transformation_map.contains({0, mapping.second})) {
           auto pre_transf = transformation_map[{0, mapping.second}];
           transformation_map.erase(mapping);
-          transformation_map[{0, mapping.second}] =
+          transformation_map[{0, mapping.first}] =
               combine_transformations(pre_transf, flip_transformation(transf));
           break;
         }
       }
     }
   }
-  for (auto keyval : transformation_map) {
-    normalized_transformations.push_back(keyval.second);
-  }
 
-  return normalized_transformations;
+  return transformation_map;
 }
 
 int main() {
-  constexpr int N = 5;
+  constexpr int N = 33;
   std::array<std::vector<std::array<int, 3>>, N> scanners =
-      parse<N>(large_test_input);
+      parse<N>(puzzle_input);
   std::array<std::array<std::vector<int>, 3>, N> scanners_transposed;
   for (int i = 0; i < N; ++i) {
     scanners_transposed[i] = transpose(scanners[i]);
@@ -1295,11 +1341,50 @@ int main() {
           find_offsets(scanners_transposed[i], scanners_transposed[j], i, j);
       if (transf) {
         transformations.push_back(transf.value());
+        std::cout << transf.value();
       }
     }
   }
   auto normalized_transformations = normalize_transformations(transformations);
-  for (auto &t : normalized_transformations) {
-    std::cout << "Mapping: " << t.sensor_1 << " " << t.sensor_2 << std::endl;
+  std::set<std::array<int, 3>> beacons;
+  std::array<std::array<std::vector<int>, 3>, N> scanners_normalized;
+  scanners_normalized[0] = scanners_transposed[0];
+  for (auto &[mapping, transf] : normalized_transformations) {
+    std::cout << transf;
   }
+
+  for (int scanner_idx = 1; scanner_idx < N; ++scanner_idx) {
+    std::cout << "Applying: " << normalized_transformations[{0, scanner_idx}];
+    auto transformed =
+        reverse_transformation(scanners_transposed[scanner_idx],
+                               normalized_transformations[{0, scanner_idx}]);
+    scanners_normalized[scanner_idx] = transformed;
+    for (size_t j = 0; j < transformed[0].size(); ++j) {
+      std::array<int, 3> b{transformed[0][j], transformed[1][j],
+                           transformed[2][j]};
+      std::cout << b[0] << "," << b[1] << "," << b[2] << "\n";
+    }
+  }
+  for (const auto &transformed : scanners_normalized) {
+    for (size_t j = 0; j < transformed[0].size(); ++j) {
+      std::array<int, 3> b{transformed[0][j], transformed[1][j],
+                           transformed[2][j]};
+      // std::cout << b[0] << "," << b[1] << "," << b[2] << "\n";
+      std::cout << b[0] << "," << b[1] << "," << b[2] << "\n";
+      beacons.insert(b);
+    }
+  }
+  std::cout << beacons.size() << std::endl;
+  std::vector<int> manhattan_distances;
+  for (auto &[mapping, t] : normalized_transformations) {
+    for (auto &[mapping2, t2] : normalized_transformations) {
+      if (mapping == mapping2)
+        continue;
+      auto scanner_distance = (std::abs(t.offsets[0] - t2.offsets[0]) +
+                               std::abs(t.offsets[1] - t2.offsets[1]) +
+                               std::abs(t.offsets[2] - t2.offsets[2]));
+      manhattan_distances.push_back(scanner_distance);
+    }
+  }
+  std::cout << *std::max_element(begin(manhattan_distances), end(manhattan_distances));
 }
